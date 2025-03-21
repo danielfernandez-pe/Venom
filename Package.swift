@@ -19,7 +19,10 @@ let package = Package(
         .target(
             name: "Venom",
             dependencies: ["Swinject"],
-            path: "Sources"
+            path: "Sources",
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]
         ),
         .testTarget(
             name: "VenomTests",
