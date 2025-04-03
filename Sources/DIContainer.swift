@@ -1,5 +1,5 @@
 //
-//  Venom.swift
+//  DIContainer.swift
 //  Venom
 //
 //  Created by Daniel Fernandez Yopla on 21.03.2025.
@@ -22,7 +22,7 @@ public final class DIContainer: DICProtocol, @unchecked Sendable {
         scopes[key] = scope
     }
     
-    public func register<Service, Arg1>(type: Service.Type, scope: Scope, factory: @escaping (Arg1) -> Service) {
+    public func register<Service, Arg1>(_ type: Service.Type, scope: Scope, factory: @escaping (Arg1) -> Service) {
         let key = String(describing: type) + "_1"
         factories[key] = factory
         scopes[key] = scope
@@ -31,7 +31,7 @@ public final class DIContainer: DICProtocol, @unchecked Sendable {
     public func resolve<Service>(_ type: Service.Type) -> Service {
         let key = String(describing: type)
         guard let scope = scopes[key] else {
-            fatalError("Service scope wasn't register properly")
+            fatalError("Service \(key) scope wasn't register properly")
         }
         
         switch scope {
@@ -41,7 +41,7 @@ public final class DIContainer: DICProtocol, @unchecked Sendable {
             }
             
             guard let factory = factories[key] as? () -> Service else {
-                fatalError("Service wasn't register previously")
+                fatalError("Service \(type) wasn't register previously")
             }
             
             let instance = factory()
@@ -49,7 +49,7 @@ public final class DIContainer: DICProtocol, @unchecked Sendable {
             return instance
         case .transient:
             guard let factory = factories[key] as? () -> Service else {
-                fatalError("Service wasn't register previously")
+                fatalError("Service \(type) wasn't register previously")
             }
             return factory()
         }
@@ -63,13 +63,20 @@ public final class DIContainer: DICProtocol, @unchecked Sendable {
         
         switch scope {
         case .container:
-            guard let factory = factories[key] as? (Arg1) -> Service else {
-                fatalError("Service wasn't registered previously with this argument type")
+            if let instance = singletons[key] as? Service {
+                return instance
             }
-            return factory(arg1)
+            
+            guard let factory = factories[key] as? (Arg1) -> Service else {
+                fatalError("Service \(type) wasn't registered previously with this argument type")
+            }
+            
+            let instance = factory(arg1)
+            singletons[key] = instance
+            return instance
         case .transient:
             guard let factory = factories[key] as? (Arg1) -> Service else {
-                fatalError("Service wasn't registered previously with this argument type")
+                fatalError("Service \(type) wasn't registered previously with this argument type")
             }
             return factory(arg1)
         }

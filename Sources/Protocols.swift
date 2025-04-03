@@ -7,13 +7,7 @@
 
 public protocol DICRegistering {
     func register<Service>(_ type: Service.Type, scope: Scope, factory: @escaping () -> Service)
-    func register<Service, Arg1>(type: Service.Type, scope: Scope, factory: @escaping (Arg1) -> Service)
-}
-
-public extension DICRegistering {
-    func register<Service>(_ type: Service.Type, factory: @escaping () -> Service) {
-        register(type, scope: .container, factory: factory)
-    }
+    func register<Service, Arg1>(_ type: Service.Type, scope: Scope, factory: @escaping (Arg1) -> Service)
 }
 
 public protocol DICResolvering {
