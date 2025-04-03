@@ -5,7 +5,6 @@
 //  Created by Daniel Fernandez Yopla on 21.03.2025.
 //
 
-import Swinject
 import Foundation
 
 public final class DIContainer: DICProtocol, @unchecked Sendable {
@@ -14,7 +13,6 @@ public final class DIContainer: DICProtocol, @unchecked Sendable {
     private var factories: [String: Any] = [:]
     private var singletons: [String: Any] = [:]
     private var scopes: [String: Scope] = [:]
-    private let container = Container()
     
     private init() {}
     
