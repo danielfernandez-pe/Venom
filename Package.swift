@@ -12,13 +12,9 @@ let package = Package(
             targets: ["Venom"]
         ),
     ],
-    dependencies: [
-        .package(url: "https://github.com/Swinject/Swinject.git", from: "2.8.3")
-    ],
     targets: [
         .target(
             name: "Venom",
-            dependencies: ["Swinject"],
             path: "Sources",
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
