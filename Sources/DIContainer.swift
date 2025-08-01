@@ -16,13 +16,13 @@ public final class DIContainer: DICProtocol, @unchecked Sendable {
     
     private init() {}
     
-    public func register<Service>(_ type: Service.Type, scope: Scope, factory: @escaping () -> Service) {
+    public func register<Service>(_ type: Service.Type, scope: Scope, factory: @escaping (DICResolvering) -> Service) {
         let key = String(describing: type)
         factories[key] = factory
         scopes[key] = scope
     }
     
-    public func register<Service, Arg1>(_ type: Service.Type, scope: Scope, factory: @escaping (Arg1) -> Service) {
+    public func register<Service, Arg1>(_ type: Service.Type, scope: Scope, factory: @escaping (DICResolvering, Arg1) -> Service) {
         let key = String(describing: type) + "_1"
         factories[key] = factory
         scopes[key] = scope
@@ -40,18 +40,18 @@ public final class DIContainer: DICProtocol, @unchecked Sendable {
                 return instance
             }
             
-            guard let factory = factories[key] as? () -> Service else {
+            guard let factory = factories[key] as? (DICResolvering) -> Service else {
                 fatalError("Service \(type) wasn't register previously")
             }
             
-            let instance = factory()
+            let instance = factory(self)
             singletons[key] = instance
             return instance
         case .transient:
-            guard let factory = factories[key] as? () -> Service else {
+            guard let factory = factories[key] as? (DICResolvering) -> Service else {
                 fatalError("Service \(type) wasn't register previously")
             }
-            return factory()
+            return factory(self)
         }
     }
     
@@ -67,18 +67,18 @@ public final class DIContainer: DICProtocol, @unchecked Sendable {
                 return instance
             }
             
-            guard let factory = factories[key] as? (Arg1) -> Service else {
+            guard let factory = factories[key] as? (DICResolvering, Arg1) -> Service else {
                 fatalError("Service \(type) wasn't registered previously with this argument type")
             }
             
-            let instance = factory(arg1)
+            let instance = factory(self, arg1)
             singletons[key] = instance
             return instance
         case .transient:
-            guard let factory = factories[key] as? (Arg1) -> Service else {
+            guard let factory = factories[key] as? (DICResolvering, Arg1) -> Service else {
                 fatalError("Service \(type) wasn't registered previously with this argument type")
             }
-            return factory(arg1)
+            return factory(self, arg1)
         }
     }
 }

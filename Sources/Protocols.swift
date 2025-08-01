@@ -6,8 +6,8 @@
 //
 
 public protocol DICRegistering {
-    func register<Service>(_ type: Service.Type, scope: Scope, factory: @escaping () -> Service)
-    func register<Service, Arg1>(_ type: Service.Type, scope: Scope, factory: @escaping (Arg1) -> Service)
+    func register<Service>(_ type: Service.Type, scope: Scope, factory: @escaping (DICResolvering) -> Service)
+    func register<Service, Arg1>(_ type: Service.Type, scope: Scope, factory: @escaping (DICResolvering, Arg1) -> Service)
 }
 
 public protocol DICResolvering {
@@ -16,3 +16,13 @@ public protocol DICResolvering {
 }
 
 public protocol DICProtocol: DICRegistering, DICResolvering {}
+
+public extension DICResolvering {
+    func resolve<Service>() -> Service {
+        return self.resolve(Service.self)
+    }
+    
+    func resolve<Service, Arg1>(arg1: Arg1) -> Service {
+        return self.resolve(Service.self, arg1: arg1)
+    }
+}
